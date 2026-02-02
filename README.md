@@ -48,13 +48,13 @@ The application is deployed using **Streamlit**, making the model accessible thr
 
 
 ## 📁 Project Structure
+```bash
 SmartFinancialForecastingSystem/
-│
 ├── Data/
-│ └── (financial datasets)
+│   └── financial_data.csv
 │
 ├── models/
-│ └── (trained / saved ML models)
+│   └── trained_model.pkl
 │
 ├── SmartFinancial.ipynb
 ├── app.py
