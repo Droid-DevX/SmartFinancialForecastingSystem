@@ -72,14 +72,17 @@ SmartFinancialForecastingSystem/
 
 
 2. Navigate to the project directory
- cd SmartFinancialForecastingSystem
+   ```bash
+    cd SmartFinancialForecastingSystem
 
 
 3. Install dependencies
+   ```bash
    pip install -r requirements.txt
 
 
 4. Run Streamlit
+   ```bash
    streamlit run app.py
 
 🌐 Deployment
@@ -88,27 +91,24 @@ The application is deployed using Streamlit, allowing users to interact with the
 
 Deployed via Streamlit Cloud
 
-📊 Use Cases
 
-Financial trend analysis
 
-Forecasting based on historical data
-
-Educational ML project for finance-based datasets
-
-Foundation for advanced financial intelligence systems
 
 🔮 Future Improvements
 
-Improve model accuracy with advanced algorithms
+- Improve model accuracy with advanced algorithms
 
-Add multiple forecasting models for comparison
 
-Integrate real-time financial data APIs
+- Add multiple forecasting models for comparison
 
-Enhance UI with more interactive visualizations
 
-Add model explainability (SHAP / feature importance)
+- Integrate real-time financial data APIs
+
+
+- Enhance UI with more interactive visualizations
+
+
+- Add model explainability (SHAP / feature importance)
 
 👨‍💻 Author
 
