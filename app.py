@@ -142,7 +142,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS finance_data (
-    username TEXT,
+    username TEXT PRIMARY KEY,
     income REAL,
     total_expense REAL,
     predicted_savings REAL,
@@ -178,7 +178,7 @@ def generate_recommendations(exp, income):
     tips = []
 
     if income <= 0:
-        return ["⚠️ Income is zero or invalid. Please enter a valid income."]
+        return ["Income is zero or invalid. Please enter a valid income."]
 
     # Core ratios
     rent_ratio = exp.get("Rent", 0) / income
@@ -195,61 +195,61 @@ def generate_recommendations(exp, income):
 
     # ---------------- HOUSING ----------------
     if rent_ratio > 0.35:
-        tips.append("🏠 Rent exceeds 35% of income. Consider downsizing, sharing accommodation, or relocating.")
+        tips.append("Rent exceeds 35% of income. Consider downsizing, sharing accommodation, or relocating.")
     elif rent_ratio < 0.20:
-        tips.append("🏠 Housing costs are well managed. This supports long-term savings.")
+        tips.append("Housing costs are well managed. This supports long-term savings.")
 
     # ---------------- FOOD ----------------
     if grocery_ratio > 0.15:
-        tips.append("🛒 Grocery spending is high. Monthly planning and bulk buying may reduce costs.")
+        tips.append("Grocery spending is high. Monthly planning and bulk buying may reduce costs.")
     elif grocery_ratio < 0.08:
-        tips.append("🛒 Grocery spending is efficient. Good budget control observed.")
+        tips.append("Grocery spending is efficient. Good budget control observed.")
 
     # ---------------- ENTERTAINMENT ----------------
     if entertainment_ratio > 0.10:
-        tips.append("🎬 Entertainment expenses are high. Consider limiting discretionary outings.")
+        tips.append("Entertainment expenses are high. Consider limiting discretionary outings.")
     elif entertainment_ratio > 0.05:
-        tips.append("🎬 Entertainment spending is moderate. Monitor for unnecessary expenses.")
+        tips.append("Entertainment spending is moderate. Monitor for unnecessary expenses.")
 
     # ---------------- LOANS ----------------
     if loan_ratio > 0.30:
-        tips.append("💳 Loan repayments are heavy. Consider refinancing or prioritizing loan closure.")
+        tips.append("Loan repayments are heavy. Consider refinancing or prioritizing loan closure.")
     elif loan_ratio > 0.20:
-        tips.append("💳 Loan burden is moderate. Avoid taking additional debt.")
+        tips.append("Loan burden is moderate. Avoid taking additional debt.")
 
     # ---------------- UTILITIES ----------------
     if utilities_ratio > 0.10:
-        tips.append("⚡ Utility expenses are high. Energy-efficient usage may reduce bills.")
+        tips.append("Utility expenses are high. Energy-efficient usage may reduce bills.")
 
     # ---------------- TRANSPORT ----------------
     if transport_ratio > 0.12:
-        tips.append("🚗 Transport expenses are high. Consider public transport or carpooling.")
+        tips.append("Transport expenses are high. Consider public transport or carpooling.")
 
     # ---------------- HEALTHCARE ----------------
     if healthcare_ratio > 0.10:
-        tips.append("🏥 Healthcare expenses are high. Ensure adequate insurance coverage.")
+        tips.append("Healthcare expenses are high. Ensure adequate insurance coverage.")
     elif healthcare_ratio < 0.03:
-        tips.append("🏥 Healthcare spending is low. Maintain regular health checkups.")
+        tips.append("Healthcare spending is low. Maintain regular health checkups.")
 
     # ---------------- EDUCATION ----------------
     if education_ratio > 0.15:
-        tips.append("🎓 Education expenses are significant. Plan expenses with long-term ROI in mind.")
+        tips.append("Education expenses are significant. Plan expenses with long-term ROI in mind.")
 
     # ---------------- SAVINGS HEALTH ----------------
     if savings_ratio < 0.10:
-        tips.append("🚨 Savings rate is very low. Immediate expense optimization is recommended.")
+        tips.append("Savings rate is very low. Immediate expense optimization is recommended.")
     elif savings_ratio < 0.20:
-        tips.append("⚠️ Savings rate is moderate. Increasing savings will improve financial security.")
+        tips.append("Savings rate is moderate. Increasing savings will improve financial security.")
     else:
-        tips.append("✅ Savings rate is healthy. You are on track for long-term goals.")
+        tips.append("Savings rate is healthy. You are on track for long-term goals.")
 
     # ---------------- OVERALL FINANCIAL HEALTH ----------------
     if total_expense > income:
-        tips.append("❗ Total expenses exceed income. This indicates financial stress and needs urgent correction.")
+        tips.append("Total expenses exceed income. This indicates financial stress and needs urgent correction.")
 
     # Fallback
     if not tips:
-        tips.append("✅ Your spending pattern is well balanced. Keep up the good financial discipline.")
+        tips.append("Your spending pattern is well balanced. Keep up the good financial discipline.")
 
     return tips
 
@@ -266,11 +266,21 @@ if not st.session_state.logged_in:
 
     if st.button(action):
         if action == "Sign Up":
-            cursor.execute("INSERT OR IGNORE INTO users VALUES (?,?)",(u,hash_password(p)))
-            conn.commit()
-            st.session_state.logged_in = True
-            st.session_state.username = u
-            st.rerun()
+            cursor.execute("SELECT username FROM users WHERE username=?", (u,))
+            existing_user = cursor.fetchone()
+
+            if existing_user:
+                st.error("Username already exists. Please choose another one.")
+            else:
+                cursor.execute(
+                    "INSERT INTO users (username, password) VALUES (?, ?)",
+                    (u, hash_password(p))
+                )
+                conn.commit()
+                st.success("Account created successfully! Please login.")
+                st.session_state.logged_in = True
+                st.session_state.username = u
+                st.rerun()
         else:
             cursor.execute("SELECT password FROM users WHERE username=?", (u,))
             row = cursor.fetchone()
@@ -294,7 +304,7 @@ if st.sidebar.button("Logout"):
 
 st.markdown("""
 <div class="glass-card">
-  <div class="main-title">📊 Financial Intelligence Dashboard</div>
+  <div class="main-title">Financial Intelligence Dashboard</div>
   <p class="subtitle">AI-powered savings prediction & smart spending insights</p>
 </div>
 """, unsafe_allow_html=True)
@@ -362,7 +372,7 @@ if submit and income>0:
     m3.metric("Predicted Savings", f"₹{predicted_savings:,.0f}")
 
     # ================= PIE CHART =================
-    st.subheader("🧩 Expense Distribution")
+    st.subheader("Expense Distribution")
 
     COLORS = [
         "#60a5fa","#f87171","#34d399","#fbbf24",
@@ -376,7 +386,7 @@ if submit and income>0:
     st.pyplot(fig)
 
     # ================= RECOMMENDATIONS =================
-    st.subheader("🤖 Smart Recommendations")
+    st.subheader("Smart Recommendations")
     for tip in generate_recommendations(expenses, income):
         st.markdown(f"- {tip}")
 
